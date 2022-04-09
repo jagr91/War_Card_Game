@@ -1,105 +1,83 @@
-import random
-FIGURES_VALUES = {
-    "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8,
-    "9": 9, "10": 10, "J": 11, "Q": 12, "K": 13, "A": 14
-}
-P1 = 0
-CPU = 1
-
-
-def create_and_shuffle_deck():
-    """combine 52 card decks by figure+colour e.g. "A♦" and shuffle it"""
-
-    figures = ["2", "3", "4", "5", "6", "7",
-               "8", "9", "10", "J", "Q", "K", "A"]
-    colours = ["♠", "♦", "♥", "♣"]
-    deck = [(str(f)+c) for f in figures for c in colours]
-    random.shuffle(deck)
-    return deck
-
+import deck
 
 def deal_cards(deck):
-    """divide deck into player and cpu"""
+    """deal deck into player and cpu"""
 
-    player_deck = []
+    p1_deck = []
     cpu_deck = []
     for num, card in enumerate(deck):
         if num % 2 == 0:
-            player_deck.append(card)
+            p1_deck.insert(0, card)
         else:
-            cpu_deck.append(card)
-    return player_deck, cpu_deck
+            cpu_deck.insert(0, card)
+    print([p1_deck, cpu_deck])
+    return [p1_deck, cpu_deck]
 
 
-def create_values_deck(deck):
-    """convert player and cpu deck each figure into value e.g. "5♦" = 5 or "Q♣" = 12"""
+def value(card):
+    """checks card figure and returns its value e.g. "5♦" = 5 or "Q♣" = 12"""
 
-    player_deck = deck[0]
-    cpu_deck = deck[1]
-    player_values = [FIGURES_VALUES[card[:-1]] for card in player_deck]
-    cpu_values = [FIGURES_VALUES[card[:-1]] for card in cpu_deck]
-    return player_values, cpu_values
+    figures_values = {
+        "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8,
+        "9": 9, "10": 10, "J": 11, "Q": 12, "K": 13, "A": 14}
+    value = figures_values[card[:-1]]
+    return value
 
-def compare_cards(deck, deck_values):
-    card_count = 0
-    your_score = 0
-    cpu_score = 0
-    for card in deck[0]:
-        print(f"Your card: {deck[0][card_count]}")
-        print(f"Opponents card: {deck[1][card_count]}")
-        if deck_values[0][card_count] > deck_values[1][card_count]:
-            print('Your card is higher')
-            your_score += 1
-        elif deck_values[0][card_count] == deck_values[1][card_count]:
-            print('WAAAR!!!!')
-        else:
-            print("Opponent's card is higher")
-            cpu_score += 1
-        print(f"Cards left:")
-        print(f"You: {your_score}")
-        print(f"CPU: {cpu_score}")
-        print("=" * 20)
-        card_count += 1
-    if your_score > cpu_score:
-        print("YOU WON")
-    elif your_score == cpu_score:
-        print("It's draw")
+
+def print_round(number):
+    round = f"Round no {number} started:"
+    underline = "=" * len(round)
+    print(f"{round}\n{underline}")
+
+
+def compare_cards(card_deck):
+    round = 1
+    print_round(round)
+    round += 1
+    p1_card = card_deck[0][0]
+    cpu_card = card_deck[1][0]
+    print(f"P1: {p1_card}")
+    print(f"CPU: {cpu_card}")
+    if value(p1_card) > value(cpu_card):
+        print('P1 card higher')
+        card_deck[0] = card_deck[0] + win(card_deck)
+    elif value(cpu_card) > value(p1_card):
+        print("CPU card higher")
+        card_deck[1] = card_deck[1] + win(card_deck)
     else:
-        print("CPU WON")
+        print("TIE")
+    print(card_deck)
+    print(len(card_deck[0]))
+    print(len(card_deck[1]))
 
-# def main():
-#     play_deck = create_and_shuffle_deck()
-#     deal = deal_cards(play_deck)
-#     cards = create_values_deck(deal)
-#     compare_cards(deal, cards)
 
-# if __name__ == '__main__':
-#     main()
+def win(card_deck):
+    cards = []
+    p1_card = card_deck[0].pop(0)
+    cpu_card = card_deck[1].pop(0)
+    cards.append(p1_card)
+    cards.append(cpu_card)
+    print(cards)
+    return cards
 
-def p1_win(card_list):
-    card_list[0].append(card_list[0][0])
-    card_list[0].append(card_list[1][0])
-    card_list[0].remove(card_list[0][0])
-    card_list[1].remove(card_list[1][0])
 
-def cpu_win(card_list):
-    card_list[1].append(card_list[1][0])
-    card_list[1].append(card_list[0][0])
-    card_list[0].remove(card_list[0][0])
-    card_list[1].remove(card_list[1][0])
+def tie():
+    pass
 
-list_a = [[4, 6, 8, 11],[18, 2, 3, 5]]
-while list_a[0] or list_a[1]:
-    if len(list_a[0]) == 0:
-        print("CPU WINS!")
-        break
-    elif len(list_a[1]) == 0:
-        print("P1 WINS!")
-        break
-    else:
-        if list_a[0][0] > list_a[1][0]:
-            p1_win(list_a)
-        elif list_a[0][0] < list_a[1][0] or list_a[0][0] == list_a[1][0]:
-            cpu_win(list_a)
-        print(f"P1 cards left: {len(list_a[0])}")
-        print(f"CPU cards left: {len(list_a[1])}")
+
+def check_winner(deck_values):
+    if len(deck_values[0]) == 0 or len(deck_values[1]) == 0:
+        if len(deck_values[0]) == 0:
+            print("\n\nYou do not have any cards left... CPU WINS!")
+            exit()
+        elif len(deck_values[1]) == 0:
+            print("\n\nCPU do not have any cards left... YOU WON!")
+            exit()
+
+def main():
+    cards = deal_cards(deck.deck())
+    compare_cards(cards)
+
+
+if __name__ == '__main__':
+    main()
