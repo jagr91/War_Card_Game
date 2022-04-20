@@ -1,4 +1,5 @@
-import deck
+from deck import create_deck
+from random import *
 
 def deal_cards(deck):
     """deal deck into player and cpu"""
@@ -10,7 +11,6 @@ def deal_cards(deck):
             p1_deck.insert(0, card)
         else:
             cpu_deck.insert(0, card)
-    print([p1_deck, cpu_deck])
     return [p1_deck, cpu_deck]
 
 
@@ -25,44 +25,75 @@ def value(card):
 
 
 def print_round(number):
-    round = f"Round no {number} started:"
+    round = f"Round {number} started:"
     underline = "=" * len(round)
-    print(f"{round}\n{underline}")
+    print(f"\n{round}\n{underline}")
+
+
+def p1_card(deck):
+    card = deck[0][0]
+    return card
+
+
+def cpu_card(deck):
+    card = deck[1][0]
+    return card
+
+
+def print_card(card_deck):
+    p1card = p1_card(card_deck)
+    cpucard = cpu_card(card_deck)
+    print(f"P1: {p1card} \nCPU: {cpucard}")
+
+
+def print_card_len(card_deck):
+    p1_deck = len(card_deck[0])
+    cpu_deck = len(card_deck[1])
+    print(f"P1: {p1_deck} \nCPU: {cpu_deck}")
 
 
 def compare_cards(card_deck):
     round = 1
-    print_round(round)
-    round += 1
-    p1_card = card_deck[0][0]
-    cpu_card = card_deck[1][0]
-    print(f"P1: {p1_card}")
-    print(f"CPU: {cpu_card}")
-    if value(p1_card) > value(cpu_card):
-        print('P1 card higher')
-        card_deck[0] = card_deck[0] + win(card_deck)
-    elif value(cpu_card) > value(p1_card):
-        print("CPU card higher")
-        card_deck[1] = card_deck[1] + win(card_deck)
-    else:
-        print("TIE")
-    print(card_deck)
-    print(len(card_deck[0]))
-    print(len(card_deck[1]))
+    pile = []
+    while len(card_deck[0]) != 0 or len(card_deck[1]) != 0:
+        print_round(round)
+        round += 1
+        p1card = p1_card(card_deck)
+        cpucard = cpu_card(card_deck)
+        print_card(card_deck)
+        if value(p1card) > value(cpucard):
+            print('P1 card higher')
+            card_deck[0] = card_deck[0] + win(card_deck) + pile
+            pile = []
+            print_card_len(card_deck)
+        elif value(p1card) < value(cpucard):
+            print("CPU card higher")
+            card_deck[1] = card_deck[1] + win(card_deck) + pile
+            pile = []
+            print_card_len(card_deck)
+        else:
+            print("WAR! You're taking one face-down card and the battle continues...")
+            pile += (tie(card_deck))
+            continue
+        check_winner(card_deck)
 
 
 def win(card_deck):
     cards = []
-    p1_card = card_deck[0].pop(0)
-    cpu_card = card_deck[1].pop(0)
-    cards.append(p1_card)
-    cards.append(cpu_card)
-    print(cards)
+    cards.append(card_deck[0].pop(0))
+    cards.append(card_deck[1].pop(0))
+    shuffle(cards)
     return cards
 
 
-def tie():
-    pass
+def tie(card_deck):
+    cards = []
+    cards.append(card_deck[0].pop(0))
+    cards.append(card_deck[1].pop(0))
+    cards.append(card_deck[0].pop(0))
+    cards.append(card_deck[1].pop(0))
+    shuffle(cards)
+    return cards
 
 
 def check_winner(deck_values):
@@ -74,8 +105,9 @@ def check_winner(deck_values):
             print("\n\nCPU do not have any cards left... YOU WON!")
             exit()
 
+
 def main():
-    cards = deal_cards(deck.deck())
+    cards = deal_cards(create_deck())
     compare_cards(cards)
 
 
