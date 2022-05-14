@@ -1,6 +1,7 @@
 from deck import create_deck
 from random import *
 
+
 def deal_cards(deck):
     """deal deck into player and cpu"""
 
@@ -58,24 +59,28 @@ def compare_cards(card_deck):
     while len(card_deck[0]) != 0 or len(card_deck[1]) != 0:
         print_round(round)
         round += 1
-        p1card = p1_card(card_deck)
-        cpucard = cpu_card(card_deck)
-        print_card(card_deck)
-        if value(p1card) > value(cpucard):
-            print('P1 card higher')
-            card_deck[0] = card_deck[0] + win(card_deck) + pile
-            pile = []
-            print_card_len(card_deck)
-        elif value(p1card) < value(cpucard):
-            print("CPU card higher")
-            card_deck[1] = card_deck[1] + win(card_deck) + pile
-            pile = []
-            print_card_len(card_deck)
-        else:
-            print("WAR! You're taking one face-down card and the battle continues...")
-            pile += (tie(card_deck))
-            continue
-        check_winner(card_deck)
+        try:
+            p1card = p1_card(card_deck)
+            cpucard = cpu_card(card_deck)
+            print_card(card_deck)
+            if value(p1card) > value(cpucard):
+                print('P1 card higher')
+                card_deck[0] = card_deck[0] + win(card_deck) + pile
+                pile = []
+                print_card_len(card_deck)
+            elif value(p1card) < value(cpucard):
+                print("CPU card higher")
+                card_deck[1] = card_deck[1] + win(card_deck) + pile
+                pile = []
+                print_card_len(card_deck)
+            else:
+                print(
+                    "WAR! You're taking one face-down card and the battle continues...")
+                pile += (tie(card_deck))
+                continue
+            check_winner(card_deck)
+        except IndexError:
+            check_winner(card_deck)
 
 
 def win(card_deck):
